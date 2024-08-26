@@ -1,0 +1,25 @@
+from klein import Klein, Plating
+from twisted.web.template import tags as t, slot
+
+class FeedAggregation(object):
+    _app = Klein()
+    _plating = Plating(
+        tags =t.html(
+            t.head(t.title("Feed Aggregator 2.0")),
+            t.body(slot(Plating.CONTENT))))
+    
+    def resource(self):
+        return self._app.resource()  #twisted.web.resource.Resource
+    
+    @_plating.routed(
+     _app.route("/"),
+     t.div(render="feeds:list")(slot("item")),       
+    )
+    def root(self, request):
+        return {u"feeds":[
+            t.table(t.tr(t.th(t.a(href="http://feed-1/")(u"First feed"))),
+                    t.tr(t.td(t.a(href=u"#first")(u"First item")))),
+            t.table(t.tr(t.th(t.a(href="http://feed-2/")(u"Second feed"))),
+                    t.tr(t.td(t.a(href=u"#second")(u"Second item")))),
+        ]
+        }
